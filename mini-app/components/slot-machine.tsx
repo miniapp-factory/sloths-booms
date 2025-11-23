@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Share } from '@/components/share';
 import { url } from '@/lib/metadata';
 
@@ -18,6 +18,7 @@ function randomFruit(): string {
 
 export default function SlotMachine() {
   const [grid, setGrid] = useState<string[][]>(Array.from({ length: 3 }, () => Array.from({ length: 3 }, randomFruit)));
+  const gridRef = useRef(grid);
   const [spinning, setSpinning] = useState(false);
   const [win, setWin] = useState<string | null>(null);
 
@@ -33,6 +34,7 @@ export default function SlotMachine() {
             newGrid[row][col] = newCol[row];
           }
         }
+        gridRef.current = newGrid;
         return newGrid;
       });
     }, 200);
@@ -41,12 +43,12 @@ export default function SlotMachine() {
       clearInterval(interval);
       setSpinning(false);
       const winner =
-        (grid[0][0] === grid[0][1] && grid[0][1] === grid[0][2] && grid[0][0]) ||
-        (grid[1][0] === grid[1][1] && grid[1][1] === grid[1][2] && grid[1][0]) ||
-        (grid[2][0] === grid[2][1] && grid[2][1] === grid[2][2] && grid[2][0]) ||
-        (grid[0][0] === grid[1][0] && grid[1][0] === grid[2][0] && grid[0][0]) ||
-        (grid[0][1] === grid[1][1] && grid[1][1] === grid[2][1] && grid[0][1]) ||
-        (grid[0][2] === grid[1][2] && grid[1][2] === grid[2][2] && grid[0][2]) ||
+        (gridRef.current[0][0] === gridRef.current[0][1] && gridRef.current[0][1] === gridRef.current[0][2] && gridRef.current[0][0]) ||
+        (gridRef.current[1][0] === gridRef.current[1][1] && gridRef.current[1][1] === gridRef.current[1][2] && gridRef.current[1][0]) ||
+        (gridRef.current[2][0] === gridRef.current[2][1] && gridRef.current[2][1] === gridRef.current[2][2] && gridRef.current[2][0]) ||
+        (gridRef.current[0][0] === gridRef.current[1][0] && gridRef.current[1][0] === gridRef.current[2][0] && gridRef.current[0][0]) ||
+        (gridRef.current[0][1] === gridRef.current[1][1] && gridRef.current[1][1] === gridRef.current[2][1] && gridRef.current[0][1]) ||
+        (gridRef.current[0][2] === gridRef.current[1][2] && gridRef.current[1][2] === gridRef.current[2][2] && gridRef.current[0][2]) ||
         null;
       setWin(winner);
     }, 2000);
@@ -79,8 +81,8 @@ export default function SlotMachine() {
       </button>
       {win && (
         <div className="flex flex-col items-center gap-2">
-          <span className="text-xl font-bold">You won with {win}s!</span>
-          <Share text={`I just won with ${win}s in the Fruit Slot Machine! ${url}`} />
+          <span className="text-xl font-bold">You won with {win}!</span>
+          <Share text={`I just won with ${win} in the Fruit Slot Machine! ${url}`} />
         </div>
       )}
     </div>
